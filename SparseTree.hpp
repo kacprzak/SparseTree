@@ -425,6 +425,32 @@ public:
 	}
 
 	/**
+	 * Reverses the order of @p key's direct children in-place.
+	 *
+	 * Only the immediate children singly-linked list is reversed; deeper
+	 * descendants are unaffected. If @p key has zero or one child this is
+	 * a no-op. Runs in O(c) time where c is the number of direct children.
+	 *
+	 * @param  key Key of the node whose children are to be reversed.
+	 * @pre    @p key must exist in the tree.
+	 */
+	void reverse_children( const key_type& key )
+	{
+		auto& first_child = m_relations.at( key ).children;
+		auto prev         = s_invalid;
+		auto current      = first_child;
+		while( current != s_invalid )
+		{
+			auto& rel = m_relations.at( current );
+			auto next = rel.next;
+			rel.next  = prev;
+			prev      = current;
+			current   = next;
+		}
+		first_child = prev;
+	}
+
+	/**
 	 * Traverses all nodes in breadth-first order, invoking @p f on each node.
 	 *
 	 * The callback receives a reference to the underlying map's key/value pair

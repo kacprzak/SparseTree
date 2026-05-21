@@ -356,6 +356,47 @@ TEST( SparseTree, set_parent_missing_key_rejected )
 	EXPECT_FALSE( tree.unset_parent( 99 ) );
 }
 
+TEST( SparseTree, reverse_children )
+{
+	sparse::Tree< std::uint8_t, float > tree;
+
+	// 0
+	// ├── 1
+	// ├── 2
+	// └── 3
+	EXPECT_TRUE( tree.insert( 0, 0.f ) );
+	EXPECT_TRUE( tree.insert( 1, 1.f, 0 ) );
+	EXPECT_TRUE( tree.insert_after( 2, 2.f, 1 ) );
+	EXPECT_TRUE( tree.insert_after( 3, 3.f, 2 ) );
+
+	{
+		const std::vector< float > expected{ 1.f, 2.f, 3.f };
+		std::vector< float > result;
+		for( auto it = tree.children_begin( 0 ); it != tree.end(); it = tree.children_next( it ) )
+			result.push_back( it->second );
+		EXPECT_EQ( result, expected );
+	}
+
+	tree.reverse_children( 0 );
+
+	{
+		const std::vector< float > expected{ 3.f, 2.f, 1.f };
+		std::vector< float > result;
+		for( auto it = tree.children_begin( 0 ); it != tree.end(); it = tree.children_next( it ) )
+			result.push_back( it->second );
+		EXPECT_EQ( result, expected );
+	}
+
+	// Reversing a single child is a no-op.
+	EXPECT_TRUE( tree.insert( 4, 4.f, 1 ) );
+	tree.reverse_children( 1 );
+	EXPECT_EQ( tree.children_begin( 1 )->first, 4u );
+
+	// Reversing an empty child list is a no-op.
+	tree.reverse_children( 3 );
+	EXPECT_EQ( tree.children_begin( 3 ), tree.end() );
+}
+
 TEST( SparseTree, sort_bfs )
 {
 	using namespace std::ranges;

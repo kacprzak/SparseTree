@@ -139,6 +139,22 @@ private:
 		return count;
 	}
 
+	/** Reverses the singly-linked list whose head is @p list_head and returns the new head. */
+	key_type reverse_list( key_type list_head )
+	{
+		auto prev    = s_invalid;
+		auto current = list_head;
+		while( current != s_invalid )
+		{
+			auto& rel = m_relations.at( current );
+			auto next = rel.next;
+			rel.next  = prev;
+			prev      = current;
+			current   = next;
+		}
+		return prev;
+	}
+
 public:
 	Tree() = default;
 	Tree( std::initializer_list< std::pair< key_type, value_type > > init )
@@ -437,18 +453,17 @@ public:
 	void reverse_children( const key_type& key )
 	{
 		auto& first_child = m_relations.at( key ).children;
-		auto prev         = s_invalid;
-		auto current      = first_child;
-		while( current != s_invalid )
-		{
-			auto& rel = m_relations.at( current );
-			auto next = rel.next;
-			rel.next  = prev;
-			prev      = current;
-			current   = next;
-		}
-		first_child = prev;
+		first_child       = reverse_list( first_child );
 	}
+
+	/**
+	 * Reverses the order of all root nodes in-place.
+	 *
+	 * Only the root singly-linked list is reversed; each root's subtree is
+	 * unaffected. If the forest has zero or one root this is a no-op.
+	 * Runs in O(r) time where r is the number of roots.
+	 */
+	void reverse_roots() { m_root = reverse_list( m_root ); }
 
 	/**
 	 * Traverses all nodes in breadth-first order, invoking @p f on each node.

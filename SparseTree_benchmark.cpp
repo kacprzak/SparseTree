@@ -54,8 +54,8 @@ BENCHMARK_DEFINE_F( BM_SparseTree, erase )( benchmark::State& state )
 	{
 		for( auto i = 0u; i < size; ++i )
 		{
-			bool success = tree.erase( std::rand() % size );
-			benchmark::DoNotOptimize( success );
+			auto count = tree.erase( std::rand() % size );
+			benchmark::DoNotOptimize( count );
 		}
 	}
 

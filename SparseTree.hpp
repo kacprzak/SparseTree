@@ -120,20 +120,23 @@ private:
 		return list;
 	}
 
-	void erase_children( key_type list )
+	size_type erase_children( key_type list )
 	{
-		auto current = list;
+		size_type count = 0;
+		auto current    = list;
 		while( current != s_invalid )
 		{
 			const auto& rel = m_relations.at( current );
 			const auto next = rel.next;
 
-			erase_children( rel.children );
+			count += erase_children( rel.children );
 			m_relations.erase( current );
 			m_map.erase( current );
+			++count;
 
 			current = next;
 		}
+		return count;
 	}
 
 public:
@@ -348,12 +351,13 @@ public:
 	 * before the node itself is removed from storage.
 	 *
 	 * @param  key Key of the node to erase.
-	 * @returns `true` if the node was erased; `false` if @p key was not found.
+	 * @returns The number of nodes erased (the node itself plus its entire subtree),
+	 *          or 0 if @p key was not found.
 	 */
-	bool erase( const key_type& key )
+	size_type erase( const key_type& key )
 	{
 		if( not m_map.contains( key ) )
-			return false;
+			return 0;
 
 		const Relation rel = m_relations.at( key );
 		if( rel.parent != s_invalid )
@@ -366,14 +370,14 @@ public:
 			m_root = list_remove( m_root, key );
 		}
 
-		erase_children( rel.children );
+		const size_type count = erase_children( rel.children ) + 1;
 
 		m_relations.erase( key );
-		const bool erased = m_map.erase( key );
+		m_map.erase( key );
 
 		assert( m_map.size() == m_relations.size() );
 
-		return erased;
+		return count;
 	}
 
 	[[nodiscard]] auto at( const key_type& key ) -> reference { return m_map.at( key ); }

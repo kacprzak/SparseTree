@@ -57,7 +57,7 @@ TEST( SparseTree, erase )
 
 	EXPECT_TRUE( tree.insert( 0, 2.f ) );
 	EXPECT_TRUE( tree.contains( 0 ) );
-	EXPECT_TRUE( tree.erase( 0 ) );
+	EXPECT_EQ( tree.erase( 0 ), 1u );
 	EXPECT_FALSE( tree.contains( 0 ) );
 }
 
@@ -102,7 +102,7 @@ TEST( SparseTree, children )
 	}
 
 	EXPECT_EQ( tree.size(), 6u );
-	tree.erase( 2 ); // erases node 2 and its subtree (4, 5)
+	EXPECT_EQ( tree.erase( 2 ), 3u ); // erases node 2 and its subtree (4, 5)
 	EXPECT_EQ( tree.size(), 3u );
 
 	{

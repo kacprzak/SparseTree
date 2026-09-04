@@ -99,6 +99,21 @@ public:
 	}
 
 	/**
+	 * Returns the smallest key that is not currently in use.
+	 *
+	 * Useful for allocating the next available key without manual tracking.
+	 * If all keys in [0, size-1] are occupied, returns `size`, which is a
+	 * valid key for the next insertion.
+	 */
+	[[nodiscard]]
+	constexpr key_type find_slot() const
+	{
+		const auto it = std::find( m_sparse.begin(), m_sparse.end(), s_invalid );
+
+		return std::distance( m_sparse.begin(), it );
+	}
+
+	/**
 	 * Inserts @p key into the set if it is not already present.
 	 *
 	 * @param  key Key to insert. Must not equal the sentinel value

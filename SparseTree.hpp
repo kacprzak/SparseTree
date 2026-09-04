@@ -4,10 +4,14 @@
 
 #include <cassert>
 #include <concepts>
+#include <cstddef>
+#include <initializer_list>
 #include <iterator>
+#include <limits>
 #include <optional>
 #include <queue>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 namespace sparse
